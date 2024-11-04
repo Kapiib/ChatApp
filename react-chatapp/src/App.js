@@ -3,7 +3,10 @@ import './App.css';
 
 function App() {
   return (
-    <h1>Dette er hovedsiden</h1>
+    <div class="wrapper">
+      <h1>Velkommen til vår side!</h1>
+      <p>Dette er vår chat app side</p>
+    </div>
   );
 }
 
