@@ -1,12 +1,16 @@
 import logo from './logo.svg';
 import './App.css';
+import {Routes, Route} from 'react-router-dom';
+import About from "./pages/about";
+import About from "./pages/about";
 
 function App() {
   return (
-    <div class="wrapper">
-      <h1>Velkommen til vår side!</h1>
-      <p>Dette er vår chat app side</p>
-    </div>
+    <Routes>
+      <Route path="/About" element={<About></About>}>
+
+      </Route>
+    </Routes>
   );
 }
 
