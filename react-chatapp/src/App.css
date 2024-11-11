@@ -1,4 +1,10 @@
 h1 {
   text-align: center;
   font-size: 68px;
+  color: var(--white);
+  /* -webkit-text-stroke: 2px var(--primary-color); */
+}
+
+body{
+  background-color: var(--black);
 }

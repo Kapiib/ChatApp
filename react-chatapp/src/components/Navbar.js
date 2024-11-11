@@ -3,7 +3,11 @@ import "../css/Navbar.css"
 
 export default function Navbar(){
     return(
+        
         <nav>
+            <div>
+                <h1 id="yaphubtext">YapHub</h1>
+            </div>
             <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/About">About</a></li>
