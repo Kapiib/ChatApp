@@ -1,0 +1,29 @@
+
+html, body{
+    height: 100%;
+    margin: 0;
+}
+
+.cu_father h1{
+    padding: 0;
+    margin: 0;
+    font-size: 50px;
+    padding-bottom: 20px;
+    color: var(--primary-color);
+}
+
+.form_box{
+    display: flex;
+    justify-content: center;
+}
+
+.create_user_form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 25%;
+    gap: 10px;
+    color: var(--white);
+}
