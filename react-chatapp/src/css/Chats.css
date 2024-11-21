@@ -1,0 +1,85 @@
+
+html, body{
+    height: 100%;
+    margin: 0;
+}
+
+#root {
+    height: 100%;
+}
+
+#fatherDiv{
+    height: 100%;
+}
+
+.chat_header{
+    background-color: rgba(255, 0, 0, 0.192);
+    height: 10vh;
+    text-align: center;
+    justify-content: space-evenly;
+    align-items: center;
+    list-style: none;
+}
+
+.chat_header ul{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    list-style: none;
+    text-align: center;
+    height: 100%;
+    color: var(--primary-color);
+    font-size: 20px;
+}
+
+.chat_header li{
+    display: grid;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.208);
+    border-radius: 25px;
+    transition: border-radius 0.5s ease;
+    user-select: none;
+}
+
+.chat_header li:hover{
+    border-radius: 10px;
+    transition: border-radius 0.5s ease;
+}
+.chat_header li:active{
+    background-color: rgba(0, 0, 0, 0.100);
+}
+
+
+li{
+    cursor: pointer;
+}
+
+
+.chat_box{
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 20% 80%;
+    font-size: 10px;
+}
+
+.chat_box h5{
+    opacity: 50%;
+    color: var(--black);
+    cursor: default;
+    user-select: none;
+}
+
+.chatpage{
+    background-color:rgba(255, 255, 255, 0.105);
+    height: 100%;
+    text-align: center;
+    font-size: 50px;
+}
+
+.people{
+    background-color: rgba(255, 255, 255, 0.144);
+    height: 100%;
+    text-align: center;
+    font-size: 50px;
+}
