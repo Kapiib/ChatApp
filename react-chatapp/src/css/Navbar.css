@@ -18,10 +18,21 @@ nav {
     margin: 0;
 }
 
+.yaphub_logo{
+    /* object-fit: cover; */
+    height: 10px;
+    width: 10px;
+    position: absolute;
+    left: 200px;
+    top: 0;
+}
+
 .top_text_YH{
+    width: 100%;
     display: flex;
     align-items: center;
-    /* gap: 500px; */
+    justify-content: center;
+    position: relative;
 }
 
 nav ul {

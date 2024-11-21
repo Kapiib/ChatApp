@@ -6,7 +6,9 @@ export default function Navbar(){
         
         <nav>
             <div class="top_text_YH">
-                <img src="/images/Yh.png" alt="Icon" width="100px" heigth="100px"></img>
+                <div class="yaphub_logo">
+                    <img src="/images/Yh.png" alt="Icon" width="100px" heigth="100px"></img>
+                </div>
                 <h1 id="yaphubtext">YapHub</h1>
             </div>
             <ul>
