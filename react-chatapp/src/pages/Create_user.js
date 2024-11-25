@@ -15,8 +15,7 @@ export default function Create_user(){
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent page reload
-    // Make the API call with axios
+    e.preventDefault(); 
     axios.post("http://localhost:4000/api/register", formData)
       .then((response) => {
         console.log("Response:", response);
