@@ -29,6 +29,8 @@ app.get("/", (req, res) => {
 })
 
 
+
+
 app.post("/api/register", (req, res) => {
     const { name, email, password, repeatPassword } = req.body;
     console.log(req.body);
