@@ -6,6 +6,7 @@ export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    userName: "",
   });
 
   const handleChange = (e) => {
@@ -29,6 +30,14 @@ export default function Login() {
       <h1>Login</h1>
       <div className="form_box_login">
         <form className="Login_form" onSubmit={handleSubmit}>
+        {/* <label>Username:</label>
+          <input
+            type="text"
+            id="userName"
+            name="userName"
+            value={formData.userName}
+            onChange={handleChange}
+          /> */}
           <label>Mail-Address:</label>
           <input
             type="text"

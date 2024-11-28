@@ -4,6 +4,12 @@ html, body{
     margin: 0;
 }
 
+li a {
+    list-style-type: none;
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
 #root {
     height: 100%;
 }

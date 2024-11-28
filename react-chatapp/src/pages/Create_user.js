@@ -7,6 +7,7 @@ export default function Create_user(){
     email: "",
     password: "",
     repeatPassword: "",
+    userName: "",
   });
 
   const handleChange = (e) => {
@@ -30,6 +31,14 @@ export default function Create_user(){
 
           <div class="form_box">
             <form class="create_user_form">
+            <label>Username:</label>
+              <input 
+              type="text"
+              id="userName"
+              name="userName"
+              value={formData.userName}
+              onChange={handleChange}
+              />
               <label>Mail-Address:</label>
               <input 
               type="text"
