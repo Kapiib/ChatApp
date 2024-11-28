@@ -5,10 +5,10 @@ export default function About(){
         <div class="chat_header">
           <ul>
             <li>
-              Home
+              <a href="/">Home</a>
             </li>
             <li>
-              Account
+              <a href="/Login">Account</a>
             </li>
           </ul>
         </div>
