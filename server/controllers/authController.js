@@ -44,9 +44,9 @@ const authController = {
                 // Create JWT payload (Extra JWT insides)
                 const payload = {
                     user_id: user.iduser,
-                    email: user.email,
                     name: user.name,
-                    role: user.role_name
+                    email: user.email,
+                    role: user.role_idroles
                 };
 
                 // Sign JWT token (Merge)
