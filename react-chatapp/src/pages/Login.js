@@ -9,20 +9,28 @@ export default function Login() {
     userName: "",
   });
 
+  const [msg, setMsg] = useState("");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); 
-    axios.post("http://localhost:4000/api/login", formData)
+    e.preventDefault();
+    axios.post("http://localhost:4000/api/user/login", { email: formData.email, password: formData.password }, { withCredentials: true })
       .then((response) => {
         console.log("Login successful:", response);
+        setMsg(response.data.msg)
+        setTimeout(() =>{
+          window.location.href="/About"
+        }, 3000)
       })
       .catch((error) => {
+
         console.error("Login failed:", error);
       });
+
   };
 
   return (
@@ -30,7 +38,7 @@ export default function Login() {
       <h1>Login</h1>
       <div className="form_box_login">
         <form className="Login_form" onSubmit={handleSubmit}>
-        {/* <label>Username:</label>
+          {/* <label>Username:</label>
           <input
             type="text"
             id="userName"
@@ -57,6 +65,7 @@ export default function Login() {
           <button type="submit">Submit</button>
         </form>
       </div>
+      {msg ? <div id="response_login">{msg}!</div> : <div></div>}
     </div>
   );
 }

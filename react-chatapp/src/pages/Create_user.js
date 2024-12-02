@@ -7,8 +7,10 @@ export default function Create_user(){
     email: "",
     password: "",
     repeatPassword: "",
-    userName: "",
+    name: "",
   });
+
+  const[msg, setMsg] = useState("");
 
   const handleChange = (e) => {
     const { name, value} = e.target;
@@ -17,12 +19,16 @@ export default function Create_user(){
 
   const handleSubmit = (e) => {
     e.preventDefault(); 
-    axios.post("http://localhost:4000/api/register", formData)
+    axios.post("http://localhost:4000/api/user/register", {email: formData.email, password: formData.password, repeatPassword: formData.repeatPassword, name: formData.name})
       .then((response) => {
-        console.log("Response:", response);
+        console.log("User Successfully created!:", response);
+        setMsg(response.data.msg)
+        setTimeout(() => {
+          window.location.href="/login"
+        }, 3000)
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error("Creation failed...", error);
       });
   };
     return(
@@ -30,18 +36,18 @@ export default function Create_user(){
           <h1>Create User</h1>
 
           <div class="form_box">
-            <form class="create_user_form">
+            <form class="create_user_form" onSubmit={handleSubmit}>
             <label>Username:</label>
               <input 
               type="text"
               id="userName"
-              name="userName"
-              value={formData.userName}
+              name="name"
+              value={formData.name}
               onChange={handleChange}
               />
               <label>Mail-Address:</label>
               <input 
-              type="text"
+              type="email"
               id="email"
               name="email"
               value={formData.email}
@@ -69,6 +75,6 @@ export default function Create_user(){
             </form>
 
           </div>
-            
+          {msg ? <div id="response_cu">{msg}!</div> : <div></div>}
         </div>
 )}
