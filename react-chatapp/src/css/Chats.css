@@ -20,7 +20,8 @@ li a {
 
 .chat_header{
     background-color: rgba(255, 0, 0, 0.192);
-    height: 10vh;
+    /* height: 10vh; */
+    height: 0;
     text-align: center;
     justify-content: space-evenly;
     align-items: center;
@@ -97,7 +98,7 @@ li{
 }
 
 .empty_grid_box{
-
+  
 }
 
 .searchBar_chatBox{
