@@ -26,9 +26,9 @@ app.use("/api/user", authRoutes);
 app.use("/api/chat", chatRoutes);
 
 // index
-app.get("/", (req3000, res) => {
-    res.redirect("/")
-})
+app.get("/", (req, res) => {
+    res.redirect("http://localhost:3000"); // Redirect to the React app
+});
 
 app.listen(4000, () => {
     console.log("Server is running on http://localhost:4000");

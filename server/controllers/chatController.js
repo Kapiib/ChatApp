@@ -30,7 +30,7 @@ const chatController = {
         
         try {
             const [ user ] = await db.query(
-                "SELECT name, email FROM user WHERE name LIKE ?",
+                "SELECT iduser, name, email FROM user WHERE name LIKE ?",
                 [ `%${username}%`]
             );
 
@@ -46,13 +46,60 @@ const chatController = {
         }
     },
     
-    message: async (req, res) => {
+    createChat: async (req, res) => {
+        const userId = req.userId; // Current user ID from JWT token
+    const { recipientId } = req.body; // ID of the user to chat with
 
-        
-    },
+    // Check if userId is defined
+    if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
+    }
 
-    directMessage: async (req, res) => {
-        
+    try {
+        // Fetch names of both users for naming the chat
+        const [users] = await db.query(
+            "SELECT iduser, name FROM user WHERE iduser IN (?, ?)",
+            [userId, recipientId]
+        );
+
+        if (users.length < 2) {
+            return res.status(404).json({ error: "One or both users not found" });
+        }
+
+        const userName1 = users[0].name; // Name of the current user
+        const userName2 = users[1].name; // Name of the recipient
+
+        // Check if a channel already exists for these two users
+        const [existingChannel] = await db.query(
+            "SELECT idchannels FROM channels WHERE (adminuser = ? AND name = ?) OR (adminuser = ? AND name = ?)",
+            [userId, userName2, recipientId, userName1]
+        );
+
+        if (existingChannel.length > 0) {
+            return res.status(200).json({ message: "Chat channel already exists", channelId: existingChannel[0].idchannels });
+        }
+
+        // Create a new chat channel with the recipient's name as the channel name
+        const [result] = await db.query(
+            "INSERT INTO channels (name, adminuser) VALUES (?, ?)",
+            [userName2, userId] // Channel named after User 2 for User 1
+        );
+
+        // Insert both users into the user_channels table
+        await db.query(
+            "INSERT INTO user_channels (channel_id, user_id) VALUES (?, ?), (?, ?)",
+            [result.insertId, userId, result.insertId, recipientId]
+        );
+
+        res.status(201).json({ 
+            message: "Chat channel created successfully", 
+            channelId: result.insertId 
+        });
+
+    } catch (error) {
+        console.error("Error creating chat channel:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
     },
 
     userChats: async (req, res) => {

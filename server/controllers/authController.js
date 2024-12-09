@@ -79,7 +79,7 @@ const authController = {
             console.error('Login error:', error);
             res.status(500).json({ msg: "Internal server error" });
         });
-    },
+},
     register: async (req, res) => {
         const { name, email, password, repeatPassword } = req.body;
     
@@ -124,8 +124,53 @@ const authController = {
             });
     } else {
         res.status(400).json({ msg: "Passwords do not match" });
+        }
+},
+    delete: async (req, res) => {
+        const token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
+
+    if (!token) {
+        return res.status(401).json({ msg: "No token provided" });
     }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET); // Verify and decode the token
+        const userId = decoded.user_id; // Extracting user_id from the decoded payload
+
+        // Step 1: Find all channels where this user is a participant
+        const [userChannels] = await db.query(
+            "SELECT channel_id FROM user_channels WHERE user_id = ?",
+            [userId]
+        );
+
+        // Step 2: Delete from user_channels first
+        await db.query("DELETE FROM user_channels WHERE user_id = ?", [userId]);
+
+        // Step 3: Optionally delete channels if there are no other users
+        for (const channel of userChannels) {
+            const channelId = channel.channel_id;
+
+            // Check how many users are in this channel
+            const [userCount] = await db.query(
+                "SELECT COUNT(*) as count FROM user_channels WHERE channel_id = ?",
+                [channelId]
+            );
+
+            if (userCount[0].count === 0) { // Only delete if there are no remaining users
+                await db.query("DELETE FROM channels WHERE idchannels = ?", [channelId]);
+            }
+        }
+
+        // Step 4: Finally, delete the user from the database
+        await db.query("DELETE FROM user WHERE iduser = ?", [userId]);
+
+        res.status(200).json({ msg: "User deleted successfully" });
+
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({ msg: "Internal server error" });
     }
+}
 }
 
 module.exports = authController;
