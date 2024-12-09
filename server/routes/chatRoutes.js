@@ -6,7 +6,7 @@ const extractUserId = require("../utils/extractUserId")
 // Define chat routes
 router.post('/create', extractUserId, chatController.create);
 router.post('/find', extractUserId, chatController.find);
-router.post('/directMessage', extractUserId, chatController.directMessage);
+router.post('/createChat', extractUserId, chatController.createChat);
 router.post('/invite', extractUserId, chatController.userChats);
 
 
