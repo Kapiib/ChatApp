@@ -3,18 +3,16 @@ import "../css/Chats.css"
 export default function About(){
     return(
       <div id="fatherDiv">
-        <div class="chat_header">
-          <ul>
-            <li>
-              <a href="/">Home</a>
-            </li>
-            <li>
-              <a href="/Login">Account</a>
-            </li>
-          </ul>
-        <div id="user_search_div">
-          
-          
+          <div class="chat_header">
+            {/* <ul>
+              <li>
+                <a href="/">Home</a>
+              </li>
+              <li>
+                <a href="/Login">Account</a>
+              </li>
+            </ul> */}
+          <div id="user_search_div">
         </div>
         </div>
         <div class="chat_box">
