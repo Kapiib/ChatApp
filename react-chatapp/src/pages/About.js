@@ -101,7 +101,7 @@ export default function About() {
 
         {/*Channel Creation og text box*/}
         <div classname="channel_creation">
-          <h1>Create Channel:</h1>
+          <h1 id="create_channel">Create Channel:</h1>
           <form onSubmit={handleCreateChannel}>
             <input
             type="text"
