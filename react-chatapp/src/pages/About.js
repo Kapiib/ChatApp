@@ -72,9 +72,7 @@ export default function About() {
       <div id="user_search_div">
       </div>
       </div>
-      <div class="chat_box">
-        <div class="empty_grid_box">empty</div>
-
+      <div class="input_search_create_grid">
         {/*Søk på bruker seksjon*/}
         <div class="searchBar_chatBox">
           <h1 id="search_user">Search user:</h1>
@@ -100,7 +98,7 @@ export default function About() {
         </div>
 
         {/*Channel Creation og text box*/}
-        <div classname="channel_creation">
+        <div classname="channel_creation" class="create_channel_css">
           <h1 id="create_channel">Create Channel:</h1>
           <form onSubmit={handleCreateChannel}>
             <input
@@ -120,7 +118,8 @@ export default function About() {
           </div>
         )}
         </div>
-
+      </div>
+      <div class="chat_box">
         <div class="people">
           <h5>People</h5>
         </div>
