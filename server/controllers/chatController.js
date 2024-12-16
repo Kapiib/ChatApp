@@ -6,7 +6,6 @@ const chatController = {
         const { name } = req.body; 
         
         try {
-            // Insert the new channel into the database with the provided name and the id to user who created it
             const [result] = await db.query(
                 "INSERT INTO channels (name, adminuser) VALUES (?, ?)",
                 [name, userId]
@@ -30,7 +29,7 @@ const chatController = {
         
         try {
             const [ user ] = await db.query(
-                "SELECT name, email FROM user WHERE name LIKE ?",
+                "SELECT iduser, name, email FROM user WHERE name LIKE ?",
                 [ `%${username}%`]
             );
 
@@ -46,18 +45,113 @@ const chatController = {
         }
     },
     
-    message: async (req, res) => {
+    createChat: async (req, res) => {
+        const userId = req.userId; 
+        const { recipientId } = req.body;
 
-        
-    },
+        if (!userId) {
+            return res.status(400).json({ error: "User ID is required" });
+        }
 
-    directMessage: async (req, res) => {
-        
+        try {
+            const [users] = await db.query(
+                "SELECT iduser, name FROM user WHERE iduser IN (?, ?)",
+                [userId, recipientId]
+            );
+
+            if (users.length < 2) {
+                return res.status(404).json({ error: "One or both users not found" });
+            }
+
+            const userName1 = users[0].name;
+            const userName2 = users[1].name;
+
+            const [existingChannel] = await db.query(
+                "SELECT idchannels FROM channels WHERE (adminuser = ? AND name = ?) OR (adminuser = ? AND name = ?)",
+                [userId, userName2, recipientId, userName1]
+            );
+
+            if (existingChannel.length > 0) {
+                return res.status(200).json({ message: "Chat channel already exists", channelId: existingChannel[0].idchannels });
+            }
+
+            const [result] = await db.query(
+                "INSERT INTO channels (name, adminuser) VALUES (?, ?)",
+                [userName2, userId] 
+            );
+
+            await db.query(
+                "INSERT INTO user_channels (channel_id, user_id) VALUES (?, ?), (?, ?)",
+                [result.insertId, userId, result.insertId, recipientId]
+            );
+
+            res.status(201).json({ 
+                message: "Chat channel created successfully", 
+                channelId: result.insertId 
+            });
+
+        } catch (error) {
+            console.error("Error creating chat channel:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
     },
 
     userChats: async (req, res) => {
-        
-    }
+        const userId = req.userId
+
+        if (!userId) {
+            return res.status(400).json({message: "User ID is required"})
+        }
+
+        try {
+            const [chats] = await db.query(`
+SELECT DISTINCT c.idchannels, c.name, c.adminuser, u.email, 
+                       CASE 
+                           WHEN c.adminuser = ? THEN (SELECT name FROM user WHERE iduser = uc.user_id AND uc.user_id != ?)
+                           ELSE c.name
+                       END AS chat_name
+                FROM channels c
+                JOIN user_channels uc ON c.idchannels = uc.channel_id
+                JOIN user u ON u.iduser = uc.user_id
+                WHERE uc.user_id = ? OR c.adminuser = ?
+            `, [userId, userId, userId, userId]);
+    
+            if (chats.length === 0) {
+                return res.status(404).json({ message: "No chats found for this user" });
+            }
+    
+            res.status(200).json({ chats });
+        } catch (error) {
+            console.error("Error fetching user chats:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+
+    },
+    uploadPhoto: async (req, res) => {
+        const userId = req.userId;
+        const channelId = req.params.channelId;
+      
+        if (!req.file) {
+          return res.status(400).json({ error: "No file uploaded" });
+        }
+      
+        try {
+          const [result] = await db.query(
+            "INSERT INTO photos (channel_id, user_id, file_path) VALUES (?, ?, ?)",
+            [channelId, userId, req.file.path]
+          );
+      
+          res.status(201).json({
+            message: "Photo uploaded successfully",
+            photoId: result.insertId,
+            filePath: req.file.path
+          });
+        } catch (error) {
+          console.error("Error uploading photo:", error);
+          res.status(500).json({ error: "Internal server error" });
+        }
+      },
+      
 };
 
   module.exports = chatController;
