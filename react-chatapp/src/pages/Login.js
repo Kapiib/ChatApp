@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "../css/Login.css";
+import { useUser } from "../UserContext";
+
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -10,6 +12,7 @@ export default function Login() {
   });
 
   const [msg, setMsg] = useState("");
+  const { setUser } = useUser();  //oppdaterer brukerens status globalt
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,12 +25,14 @@ export default function Login() {
       .then((response) => {
         console.log("Login successful:", response);
         setMsg(response.data.msg)
+        setUser(response.data.user)
+
         setTimeout(() =>{
-          window.location.href="/About"
+          window.location.href="/Account"
         }, 3000)
+
       })
       .catch((error) => {
-
         console.error("Login failed:", error);
       });
 
