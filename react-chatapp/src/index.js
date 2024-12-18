@@ -5,14 +5,17 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter} from "react-router-dom";
 import Navbar from './components/Navbar';
+import { UserProvider } from "./UserContext";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <UserProvider>
     <BrowserRouter>
-    <Navbar></Navbar>
-      <App />
-    </BrowserRouter>
+      {/* <Navbar></Navbar> */}
+        <App />
+      </BrowserRouter>
+    </UserProvider>
   </React.StrictMode>
 );
 
