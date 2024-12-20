@@ -12,73 +12,67 @@ const authController = {
     login: async (req, res) => {
         const { email, password } = req.body;
 
-    // Validate input
-    if (!email || !password) {
-        return res.status(400).json({ msg: "Please provide both email and password" });
-    }
+        // Validate input
+        if (!email || !password) {
+            return res.status(400).json({ msg: "Please provide both email and password" });
+        }
 
-    // Query to get user data including password and role
-    const sqlQuery = `
-        SELECT user.*, roles.name as role_name 
-        FROM user 
-        JOIN roles ON user.roles_idroles = roles.idroles 
-        WHERE email = ?
-    `;
+        // Query to get user data including password and role
+        const sqlQuery = `
+            SELECT user.*, roles.name as role_name 
+            FROM user 
+            JOIN roles ON user.roles_idroles = roles.idroles 
+            WHERE email = ?
+        `;
 
-    db.query(sqlQuery, [email])
-        .then(([[user]]) => {
+        try {
+            const [[user]] = await db.query(sqlQuery, [email]); // Use await here
             if (!user) {
                 return res.status(401).json({ msg: "User does not exist" });
             }
 
             // Compare password with hashed password in database
-            bcrypt.compare(password, user.password, function(err, result) {
-                if (err) {
-                    return res.status(500).json({ msg: "Error comparing passwords" });
-                }
+            const isPasswordValid = await bcrypt.compare(password, user.password); // Use await here
+            if (!isPasswordValid) {
+                return res.status(401).json({ msg: "Invalid password" });
+            }
 
-                if (!result) {
-                    return res.status(401).json({ msg: "Invalid password" });
-                }
+            // Create JWT payload
+            const payload = {
+                user_id: user.iduser,
+                name: user.name,
+                email: user.email,
+                role: user.role_idroles
+            };
 
-                // Create JWT payload (Extra JWT insides)
-                const payload = {
-                    user_id: user.iduser,
+            // Sign JWT token
+            const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+
+            // Update lastLoggedIn timestamp
+            const updateQuery = `UPDATE user SET lastLoggedIn = NOW() WHERE iduser = ?`;
+            await db.query(updateQuery, [user.iduser]); // Use await here
+
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 24 * 60 * 60 * 1000
+            });
+
+            res.status(200).json({
+                msg: "Login successful",
+                user: {
+                    id: user.iduser,
                     name: user.name,
                     email: user.email,
-                    role: user.role_idroles
-                };
-
-                // Sign JWT token (Merge)
-                const token = jwt.sign(
-                    payload,
-                    JWT_SECRET,
-                    { expiresIn: '24h' }
-                );
-
-                res.cookie('token', token, {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'strict',
-                    maxAge: 24 * 60 * 60 * 1000
-                });
-
-                res.status(200).json({
-                    msg: "Login successful",
-                    user: {
-                        id: user.iduser,
-                        name: user.name,
-                        email: user.email,
-                        role: user.role_name,
-                        token: token
-                    }
-                });
+                    role: user.role_name,
+                    token: token
+                }
             });
-        })
-        .catch((error) => {
+        } catch (error) {
             console.error('Login error:', error);
             res.status(500).json({ msg: "Internal server error" });
-        });
+        }
 },
     register: async (req, res) => {
         const { name, email, password, repeatPassword } = req.body;
@@ -127,7 +121,7 @@ const authController = {
         }
 },
     delete: async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
+        const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
         return res.status(401).json({ msg: "No token provided" });
@@ -137,16 +131,16 @@ const authController = {
         const decoded = jwt.verify(token, JWT_SECRET); // Verify and decode the token
         const userId = decoded.user_id; // Extracting user_id from the decoded payload
 
-        // Step 1: Find all channels where this user is a participant
+        //Finds all channels where this user is a participant
         const [userChannels] = await db.query(
             "SELECT channel_id FROM user_channels WHERE user_id = ?",
             [userId]
         );
 
-        // Step 2: Delete from user_channels first
+        //Deletes from user_channels first
         await db.query("DELETE FROM user_channels WHERE user_id = ?", [userId]);
 
-        // Step 3: Optionally delete channels if there are no other users
+        //Optionally delete channels if there are no other users
         for (const channel of userChannels) {
             const channelId = channel.channel_id;
 
@@ -161,7 +155,7 @@ const authController = {
             }
         }
 
-        // Step 4: Finally, delete the user from the database
+        //Finally, delete the user from the database (Too much work)
         await db.query("DELETE FROM user WHERE iduser = ?", [userId]);
 
         res.status(200).json({ msg: "User deleted successfully" });

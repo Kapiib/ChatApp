@@ -105,7 +105,7 @@ const chatController = {
 
         try {
             const [chats] = await db.query(`
-SELECT DISTINCT c.idchannels, c.name, c.adminuser, u.email, 
+                SELECT DISTINCT c.idchannels, c.name, c.adminuser, u.email, 
                        CASE 
                            WHEN c.adminuser = ? THEN (SELECT name FROM user WHERE iduser = uc.user_id AND uc.user_id != ?)
                            ELSE c.name
@@ -151,7 +151,53 @@ SELECT DISTINCT c.idchannels, c.name, c.adminuser, u.email,
           res.status(500).json({ error: "Internal server error" });
         }
       },
-      
+      sendMessage: async (req, res, io) => {
+        const userId = req.userId; // Extract user ID from JWT
+        const { content } = req.body;
+
+        // Get current channelId from session
+        const channelId = req.session.currentChannelId;
+
+        if (!channelId) {
+            return res.status(400).json({ error: "Channel ID is required" });
+        }
+    
+        try {
+            const [result] = await db.query(
+                "INSERT INTO message (message, sendTime, user_id, channel_id) VALUES (?, ?, ?, ?)",
+                [content, new Date(), userId, channelId]
+            );
+    
+            const newMessage = {
+                idMessage: result.insertId,
+                message: content,
+                sendTime: new Date(),
+                user_id: userId,
+                channel_id: channelId
+            };
+    
+            // Emit the new message to all clients in the specified channel
+            io.to(channelId).emit("receive_message", newMessage);
+    
+            res.status(201).json(newMessage);
+        } catch (error) {
+            console.error("Error sending message:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    },
+
+    getMessages: async (req, res) => {
+        try {
+            const [messages] = await db.query(
+                "SELECT * FROM message ORDER BY sendTime ASC"
+            );
+
+            res.status(200).json({ messages });
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
 };
 
   module.exports = chatController;
